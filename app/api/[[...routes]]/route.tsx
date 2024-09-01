@@ -1,6 +1,6 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog, TextInput } from 'frog'
+import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
 import { neynar } from 'frog/hubs'
 import { handle } from 'frog/next'
@@ -8,7 +8,7 @@ import { serveStatic } from 'frog/serve-static'
 import path from 'path';
 import fs from 'fs/promises';
 import { Fan } from '../../utils/interface'
-import { getDisplayName, getTop10Fans, getUserPfpUrl, weightedRaffle } from '../../utils/helpers'
+import { getDisplayName, getTop10Fans, getUserPfpUrl, weightedRaffle, postLum0xTestFrameValidation } from '../../utils/helpers'
 import { createFan, getFan } from '@/app/utils/db/queries/fans';
 import { getLeaderboardImage } from '../../ui/leaderboard'
 import { getShareImage } from '../../ui/share'
@@ -67,6 +67,8 @@ app.frame('/', (c) => {
 app.frame('/raffle', async (c) => {
   const fid = c.frameData?.fid
 
+  await postLum0xTestFrameValidation(Number(fid), 'raffle')
+
   const winner: Fan = await weightedRaffle(Number(fid))
 
   const fanDocRef = await createFan(winner)
@@ -91,6 +93,8 @@ app.frame('/fans', async (c) => {
     return c.error({ message: 'Invalid fid', statusCode: 404 })
   }
 
+  await postLum0xTestFrameValidation(Number(fid), 'fans')
+
   return c.res({
     image: `/leaderboard-image/${fid}`,
     intents: [
@@ -101,8 +105,12 @@ app.frame('/fans', async (c) => {
 })
 
 app.frame('/share/:id', async (c) => {
+  const viewerFid = c.frameData?.fid
   const id = c.req.param('id')
   const fanDoc = await getFan(id)
+
+  await postLum0xTestFrameValidation(Number(viewerFid), 'share')
+
   const { fid, ranks, score, reactions, recasts } = fanDoc.data() as Fan
   const displayName = await getDisplayName(String(fid))
   const pfpUrl = await getUserPfpUrl(fid)
