@@ -70,7 +70,7 @@ app.frame('/raffle', async (c) => {
   const winner: Fan = await weightedRaffle(Number(fid))
 
   const fanDocRef = await createFan(winner)
-  const shareUrl = `${process.env.BASE_URL}/share/${fanDocRef.id}`
+  const shareUrl = `${process.env.BASE_URL ?? 'http://localhost:3000'}/api/share/${fanDocRef.id}`
 
   return c.res({
     image: '/Result.png',
