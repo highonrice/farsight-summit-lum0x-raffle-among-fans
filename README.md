@@ -10,6 +10,18 @@ This Frame enables you to conduct a raffle among your Farcaster fans, with a uni
 
 ## Usage
 
+There are some .env variables you should set.
+
+BASE_URL=<App's url when deployed>
+NEYNAR_API_KEY=<Your NEYNAR API Key>
+LUM0X_API_KEY=<Your Lum0x API Key>
+FIREBASE_PRIVATE_KEY_ID=<Firebase admin cerficate>
+FIREBASE_PRIVATE_KEY=<Firebase admin cerficate>
+FIREBASE_PROJECT_ID=<Firebase admin cerficate>
+FIREBASE_CLIENT_EMAIL=<Firebase admin cerficate>
+FIREBASE_CLIENT_ID=<Firebase admin cerficate>
+FIREBASE_CLIENT_X509_CERT_URL=<Firebase admin cerficate>
+
 ```
 npm install
 npm run dev
