@@ -70,7 +70,11 @@ app.frame('/raffle', async (c) => {
   const winner: Fan = await weightedRaffle(Number(fid))
 
   const fanDocRef = await createFan(winner)
-  const shareUrl = `${process.env.BASE_URL ?? 'http://localhost:3000'}/api/share/${fanDocRef.id}`
+
+  const frameUrl = `${process.env.BASE_URL}/api/share/${fanDocRef.id}`
+  const message = `Winner of the raffle is...!!`
+  const urlMessage = message.replace(/ /g, '%20')
+  const shareUrl = `https://warpcast.com/~/compose?text=${urlMessage}&embeds[]=${frameUrl}`
 
   return c.res({
     image: '/Result.png',
