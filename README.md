@@ -15,12 +15,9 @@ There are some .env variables you should set.
 BASE_URL=<App's url when deployed>
 NEYNAR_API_KEY=<Your NEYNAR API Key>
 LUM0X_API_KEY=<Your Lum0x API Key>
-FIREBASE_PRIVATE_KEY_ID=<Firebase admin cerficate>
-FIREBASE_PRIVATE_KEY=<Firebase admin cerficate>
-FIREBASE_PROJECT_ID=<Firebase admin cerficate>
-FIREBASE_CLIENT_EMAIL=<Firebase admin cerficate>
-FIREBASE_CLIENT_ID=<Firebase admin cerficate>
-FIREBASE_CLIENT_X509_CERT_URL=<Firebase admin cerficate>
+FIREBASE_SERVICE_ACCOUNT_KEY=<Firebase admin private key string>
+
+To learn how to use service account key json file with vercel, refer to this article: https://dev.to/vvo/how-to-add-firebase-service-account-json-files-to-vercel-ph5
 
 ```
 npm install
