@@ -1,0 +1,31 @@
+{
+  "name": "template-next",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "deploy": "vercel",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase": "^10.13.1",
+    "firebase-admin": "^12.4.0",
+    "frog": "latest",
+    "hono": "^4",
+    "lum0x-sdk": "^1.0.35",
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5",
+    "vercel": "^32.4.1"
+  },
+  "type": "module"
+}
