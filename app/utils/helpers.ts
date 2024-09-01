@@ -143,3 +143,7 @@ export async function postLum0xTestFrameValidation(fid: number, path: string) {
         })
       });
 }
+
+export async function main(fid: number) {
+    return await weightedRaffle(fid)
+}
