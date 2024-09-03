@@ -73,7 +73,7 @@ app.frame("/", (c) => {
   return c.res({
     image: "/Default.png",
     intents: [
-      <Button action="/raffle">Raffle!</Button>,
+      <Button action="/result">Raffle!</Button>,
       // <Button action="/fans">My Top 10 Fans</Button>,
     ],
   });
@@ -86,21 +86,45 @@ app.frame("/raffle", async (c) => {
 
   // const winner: Fan = await weightedRaffle(Number(fid));
 
-  const winner: Participant = await getUserFromChannel();
-  console.log(winner);
+  // const winner: Participant = await getUserFromChannel();
+  // console.log(winner);
   // const fanDocRef = await createFan(winner);
-  const participantDocRef = await createParticipant(winner);
+  // const participantDocRef = await createParticipant(winner);
 
   // const frameUrl = `${process.env.BASE_URL}/api/share/${fanDocRef.id}`;
-  const frameUrl = `${process.env.BASE_URL}/api/share/${participantDocRef.id}`;
+  // const frameUrl = `${process.env.BASE_URL}/api/share/${participantDocRef.id}`;
   const message = `Winner of the raffle is...!!`;
   const urlMessage = message.replace(/ /g, "%20");
-  const shareUrl = `https://warpcast.com/~/compose?text=${urlMessage}&embeds[]=${frameUrl}`;
+  // const shareUrl = `https://warpcast.com/~/compose?text=${urlMessage}&embeds[]=${frameUrl}`;
 
   return c.res({
     image: "/Result.png",
     intents: [
-      <Button.Link href={shareUrl}>Share</Button.Link>,
+      // <Button.Link href={shareUrl}>Share</Button.Link>,
+      <Button action="/result/">Share</Button>,
+      <Button action="/">Back</Button>,
+    ],
+  });
+});
+
+app.frame("/result", async (c) => {
+  const winner: Participant = await getUserFromChannel();
+
+  // const participantDoc = await getParticipant(String(winner.fid));
+  // const { fid } = participantDoc.data() as Participant;
+  const displayName = await getDisplayName(String(winner.fid));
+  const pfpUrl = await getUserPfpUrl(winner.fid);
+  return c.res({
+    image: getShareImage(
+      // ranks,
+      // score,
+      // reactions,
+      // recasts,
+      displayName[0],
+      pfpUrl
+    ),
+    intents: [
+      // <Button action="/raffle">Raffle</Button>,
       <Button action="/">Back</Button>,
     ],
   });

@@ -27,7 +27,7 @@ export function getShareImage(
         style={{
           position: "absolute",
           display: "flex",
-          top: 700,
+          top: 0,
           left: 0,
           width: "100%",
         }}
@@ -38,9 +38,10 @@ export function getShareImage(
         style={{
           position: "absolute",
           display: "flex",
-          top: 750,
-          left: 40,
-          width: "100%",
+          top: 730,
+          left: 450,
+          width: 300,
+          height: 45,
           color: "white",
           fontSize: 54,
           fontFamily: "coinbase",
@@ -52,16 +53,16 @@ export function getShareImage(
         style={{
           position: "absolute",
           display: "flex",
-          top: 970,
-          left: 245,
+          top: 300,
+          left: 380,
           width: "28%",
           fontFamily: "Poppins",
         }}
       >
         <img
           src={pfpUrl}
-          width={320}
-          height={320}
+          width={400}
+          height={400}
           style={{
             borderRadius: "60%",
           }}
