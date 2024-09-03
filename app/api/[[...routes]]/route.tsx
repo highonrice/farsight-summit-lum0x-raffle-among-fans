@@ -12,7 +12,6 @@ import {
   getUserFromChannel,
 } from "../../utils/helpers";
 import { getShareImage } from "../../ui/share";
-import { Box } from "./ui";
 
 const app = new Frog({
   assetsPath: "/",
@@ -29,7 +28,7 @@ const app = new Frog({
 app.frame("/", (c) => {
   return c.res({
     image: "/Default.png",
-    intents: [<Button.Link href="/result">Raffle!</Button.Link>],
+    intents: [<Button action="/result">Raffle!</Button>],
   });
 });
 
