@@ -42,7 +42,7 @@ app.frame("/result", async (c) => {
   console.log(pfpUrl);
 
   return c.res({
-    image: "/Default.png",
+    image: getShareImage(displayName[0], pfpUrl),
     intents: [<Button action="/">Back</Button>],
   });
 });
