@@ -40,6 +40,7 @@ app.frame("/result", async (c) => {
   console.log(displayName);
   const pfpUrl = await getUserPfpUrl(winner.fid);
   console.log(pfpUrl);
+
   return c.res({
     image: getShareImage(displayName[0], pfpUrl),
     // image: getShareImage(
