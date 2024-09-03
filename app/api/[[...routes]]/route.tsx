@@ -29,7 +29,7 @@ const app = new Frog({
 app.frame("/", (c) => {
   return c.res({
     image: "/Default.png",
-    intents: [<Button action="/result">Raffle!</Button>],
+    intents: [<Button.Link href="/result">Raffle!</Button.Link>],
   });
 });
 
@@ -42,12 +42,7 @@ app.frame("/result", async (c) => {
   console.log(pfpUrl);
 
   return c.res({
-    image: getShareImage(displayName[0], pfpUrl),
-    // image: getShareImage(
-    //   "Amy",
-    //   "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/5a205540-e1e9-4ae5-75e7-979e3026df00/rectcrop3"
-    // ),
-
+    image: "/Default.png",
     intents: [<Button action="/">Back</Button>],
   });
 });
