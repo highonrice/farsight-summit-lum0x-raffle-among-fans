@@ -37,7 +37,8 @@ export function getShareImage(displayName?: string, pfpUrl?: string) {
           fontFamily: "coinbase",
         }}
       >
-        {`${displayName}`}
+        {/* {`${displayName}`} */}
+        Amy
       </div>
       <div
         style={{
@@ -50,7 +51,8 @@ export function getShareImage(displayName?: string, pfpUrl?: string) {
         }}
       >
         <img
-          src={pfpUrl}
+          src="https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/5a205540-e1e9-4ae5-75e7-979e3026df00/rectcrop3"
+          //   src={pfpUrl}
           width={400}
           height={400}
           style={{
