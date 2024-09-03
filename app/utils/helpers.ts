@@ -1,5 +1,5 @@
 import { Lum0x } from "lum0x-sdk";
-import { Cast, User, Fan } from "./interface";
+import { Cast, Fan, Participant } from "./interface";
 
 Lum0x.init(process.env.LUM0X_API_KEY || "");
 
@@ -22,45 +22,45 @@ function getSortedScores(): Fan[] {
 }
 
 // Updates the scoreBoard based on reactions and recasts for a given Cast.
-function processReaction(cast: Cast): void {
-  const { reactions, recasts } = cast;
-  const reactionFids = reactions.fids;
-  const recastFids = recasts.fids;
+// function processReaction(cast: Cast): void {
+//   const { reactions, recasts } = cast;
+//   const reactionFids = reactions.fids;
+//   const recastFids = recasts.fids;
 
-  for (const reactionFid of reactionFids) {
-    if (!scoreBoard[reactionFid]) {
-      scoreBoard[reactionFid] = {
-        fid: reactionFid,
-        score: 0,
-        reactions: 0,
-        recasts: 0,
-        ranks: 0,
-      };
-    }
-    scoreBoard[reactionFid].score += reactionScore;
-    scoreBoard[reactionFid].reactions += 1;
-  }
+//   for (const reactionFid of reactionFids) {
+//     if (!scoreBoard[reactionFid]) {
+//       scoreBoard[reactionFid] = {
+//         fid: reactionFid,
+//         score: 0,
+//         reactions: 0,
+//         recasts: 0,
+//         ranks: 0,
+//       };
+//     }
+//     scoreBoard[reactionFid].score += reactionScore;
+//     scoreBoard[reactionFid].reactions += 1;
+//   }
 
-  for (const recastFid of recastFids) {
-    if (!scoreBoard[recastFid]) {
-      scoreBoard[recastFid] = {
-        fid: recastFid,
-        score: 0,
-        reactions: 0,
-        recasts: 0,
-        ranks: 0,
-      };
-    }
-    scoreBoard[recastFid].score += recastScore;
-    scoreBoard[recastFid].recasts += 1;
-  }
-}
+//   for (const recastFid of recastFids) {
+//     if (!scoreBoard[recastFid]) {
+//       scoreBoard[recastFid] = {
+//         fid: recastFid,
+//         score: 0,
+//         reactions: 0,
+//         recasts: 0,
+//         ranks: 0,
+//       };
+//     }
+//     scoreBoard[recastFid].score += recastScore;
+//     scoreBoard[recastFid].recasts += 1;
+//   }
+// }
 
 export async function getDisplayName(fids: string): Promise<string[]> {
   const res = await Lum0x.farcasterUser.getUserByFids({ fids: fids });
-  const users: User[] = res.users;
-
-  return users.map((user) => user.display_name);
+  // const users: User[] = res.users;
+  const participants: Participant[] = res.users;
+  return participants.map((participant) => participant.display_name);
 }
 
 async function searchMyFan(fid: number): Promise<Fan[]> {
@@ -71,7 +71,7 @@ async function searchMyFan(fid: number): Promise<Fan[]> {
 
   const casts: Cast[] = res.result.casts;
   for (const cast of casts) {
-    processReaction(cast);
+    // processReaction(cast);
   }
 
   const sortedFids: Fan[] = getSortedScores();
@@ -87,7 +87,7 @@ export async function getTop10Fans(fid: number): Promise<Fan[]> {
 
   const casts: Cast[] = res.result.casts;
   for (const cast of casts) {
-    processReaction(cast);
+    // processReaction(cast);
   }
 
   const sortedFids: Fan[] = getSortedScores();
@@ -108,7 +108,7 @@ export async function getTop10Fans(fid: number): Promise<Fan[]> {
   return sortedFids;
 }
 
-export async function weightedRaffle(fid: number): Promise<Fan> {
+export async function weightedRaffle(fid: number): Promise<Fan | Participant> {
   const fans = await searchMyFan(fid);
   const totalWeight = fans.reduce((total, fan) => total + fan.score, 0);
   let randomValue = Math.random() * totalWeight;
@@ -129,7 +129,12 @@ export async function getUserPfpUrl(fid: number): Promise<string> {
 
   return user.pfp_url;
 }
+export async function getUserDisplayName(fid: number): Promise<string> {
+  const res = await Lum0x.farcasterUser.getUserByFids({ fids: String(fid) });
+  const user = res.users[0];
 
+  return user.display_name;
+}
 export async function postLum0xTestFrameValidation(fid: number, path: string) {
   fetch("https://testnetapi.lum0x.com/frame/validation", {
     method: "POST",
@@ -143,20 +148,23 @@ export async function postLum0xTestFrameValidation(fid: number, path: string) {
     }),
   });
 }
-// 채널에서 최근 캐스트 조회
+// farsightsummit채널에서 최근 캐스트 25개의 작성자중 한명 임의 선택 -> fid,display_name 반환
 export async function getUserFromChannel() {
   let res = await Lum0x.farcasterFeed.getFeed({
     feed_type: "filter",
     filter_type: "parent_url",
     parent_url: "https://warpcast.com/~/channel/farsightsummit",
   });
+  let authors = res.casts.map((cast: any) => cast.author.fid);
+  let authorSet: Set<any> = new Set(authors);
 
-  let authorList = new Set(
-    res.casts.map((cast: any) => cast.author.display_name)
-  );
+  const authorList = Array.from(authorSet);
+  const randomArray = authorList.sort(() => Math.random() - 0.5);
+  const displayName = await getUserDisplayName(randomArray[0]);
 
-  console.log(authorList);
+  return { fid: randomArray[0], display_name: displayName };
 }
+
 // export async function main(fid: number) {
 //     return await weightedRaffle(fid)
 // }

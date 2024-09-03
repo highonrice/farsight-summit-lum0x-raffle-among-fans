@@ -7,15 +7,20 @@ import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import path from "path";
 import fs from "fs/promises";
-import { Fan } from "../../utils/interface";
+import { Fan, Participant } from "../../utils/interface";
 import {
   getDisplayName,
   getTop10Fans,
   getUserPfpUrl,
   weightedRaffle,
   postLum0xTestFrameValidation,
+  getUserFromChannel,
 } from "../../utils/helpers";
-import { createFan, getFan } from "@/app/utils/db/queries/fans";
+// import { createFan, getFan } from "@/app/utils/db/queries/fans";
+import {
+  createParticipant,
+  getParticipant,
+} from "@/app/utils/db/queries/participants";
 import { getLeaderboardImage } from "../../ui/leaderboard";
 import { getShareImage } from "../../ui/share";
 
@@ -40,10 +45,10 @@ const app = new Frog({
   basePath: "/api",
   hub: neynar({ apiKey: process.env.NEYNAR_API_KEY ?? "" }),
   title: "Raffle among your fans",
-  imageAspectRatio: "1.91:1",
+  imageAspectRatio: "1:1",
   imageOptions: {
-    height: 1910,
-    width: 1000,
+    height: 1106,
+    width: 1106,
     fonts: [
       {
         name: "coinbase",
@@ -69,7 +74,7 @@ app.frame("/", (c) => {
     image: "/Default.png",
     intents: [
       <Button action="/raffle">Raffle!</Button>,
-      <Button action="/fans">My Top 10 Fans</Button>,
+      // <Button action="/fans">My Top 10 Fans</Button>,
     ],
   });
 });
@@ -79,11 +84,15 @@ app.frame("/raffle", async (c) => {
 
   await postLum0xTestFrameValidation(Number(fid), "raffle");
 
-  const winner: Fan = await weightedRaffle(Number(fid));
+  // const winner: Fan = await weightedRaffle(Number(fid));
 
-  const fanDocRef = await createFan(winner);
+  const winner: Participant = await getUserFromChannel();
+  console.log(winner);
+  // const fanDocRef = await createFan(winner);
+  const participantDocRef = await createParticipant(winner);
 
-  const frameUrl = `${process.env.BASE_URL}/api/share/${fanDocRef.id}`;
+  // const frameUrl = `${process.env.BASE_URL}/api/share/${fanDocRef.id}`;
+  const frameUrl = `${process.env.BASE_URL}/api/share/${participantDocRef.id}`;
   const message = `Winner of the raffle is...!!`;
   const urlMessage = message.replace(/ /g, "%20");
   const shareUrl = `https://warpcast.com/~/compose?text=${urlMessage}&embeds[]=${frameUrl}`;
@@ -117,25 +126,27 @@ app.frame("/fans", async (c) => {
 app.frame("/share/:id", async (c) => {
   const viewerFid = c.frameData?.fid;
   const id = c.req.param("id");
-  const fanDoc = await getFan(id);
+  // const fanDoc = await getFan(id);
+  const participantDoc = await getParticipant(id);
 
   await postLum0xTestFrameValidation(Number(viewerFid), "share");
 
-  const { fid, ranks, score, reactions, recasts } = fanDoc.data() as Fan;
+  // const { fid, ranks, score, reactions, recasts } = fanDoc.data() as Fan;
+  const { fid } = participantDoc.data() as Participant;
   const displayName = await getDisplayName(String(fid));
   const pfpUrl = await getUserPfpUrl(fid);
   return c.res({
     image: getShareImage(
-      ranks,
-      score,
-      reactions,
-      recasts,
+      // ranks,
+      // score,
+      // reactions,
+      // recasts,
       displayName[0],
       pfpUrl
     ),
     intents: [
       <Button action="/raffle">Raffle</Button>,
-      <Button action="/fans">My Top 10 Fans</Button>,
+      // <Button action="/fans">My Top 10 Fans</Button>,
     ],
   });
 });

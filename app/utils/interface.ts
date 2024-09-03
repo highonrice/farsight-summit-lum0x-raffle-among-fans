@@ -4,7 +4,7 @@ export interface Fan {
   reactions: number;
   recasts: number;
   ranks: number;
-  display_name?: string;
+  display_name: string;
 }
 
 export interface Cast {
@@ -12,7 +12,7 @@ export interface Cast {
   recasts: { fids: number[] };
 }
 
-export interface User {
-  fid?: number;
+export interface Participant {
+  fid: number;
   display_name: string;
 }
