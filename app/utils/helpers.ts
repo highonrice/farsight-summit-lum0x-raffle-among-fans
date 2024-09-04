@@ -36,17 +36,27 @@ export async function postLum0xTestFrameValidation(fid: number, path: string) {
   });
 }
 // farsightsummit 채널에서 9월 2일 이후 캐스트 작성자 중 한명 임의 선택 -> fid,display_name 반환
-export async function getUserFromChannel() {
+export async function getUserFromChannel(
+  startDate: string | undefined,
+  endDate: string | undefined
+) {
   let res = await Lum0x.farcasterFeed.getFeed({
     feed_type: "filter",
     filter_type: "parent_url",
     parent_url: "https://warpcast.com/~/channel/farsightsummit",
   });
-  let filteredCasts = res.casts.filter(
-    (cast: { timestamp: number }) =>
-      //2024-09-02T00:09:30
-      new Date(cast.timestamp).getTime() > 1725235770000
-  );
+  let startDateUnix = startDate && new Date(startDate).getTime();
+  let endDateUnix = endDate && new Date(endDate).getTime();
+  let filteredCasts = res.casts.filter((cast: { timestamp: number }) => {
+    //2024-09-02T00:09:30
+    //start와 end날짜가 같은경우 예외처리
+    if (startDateUnix === endDateUnix) {
+      new Date(cast.timestamp).getTime() < Number(endDateUnix);
+    } else {
+      Number(startDateUnix) < new Date(cast.timestamp).getTime() &&
+        new Date(cast.timestamp).getTime() < Number(endDateUnix);
+    }
+  });
   if (filteredCasts.length === 0) {
     return { fid: 321762, display_name: "Amy" };
   }

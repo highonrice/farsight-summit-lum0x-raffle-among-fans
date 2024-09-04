@@ -1,6 +1,6 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog } from "frog";
+import { Button, Frog, TextInput } from "frog";
 import { devtools } from "frog/dev";
 import { neynar } from "frog/hubs";
 import { handle } from "frog/next";
@@ -12,6 +12,9 @@ import {
   getUserFromChannel,
 } from "../../utils/helpers";
 import { getShareImage } from "../../ui/share";
+
+let startDate: string | undefined;
+let endDate: string | undefined;
 
 const app = new Frog({
   assetsPath: "/",
@@ -28,21 +31,39 @@ const app = new Frog({
 app.frame("/", (c) => {
   return c.res({
     image: "/Default.png",
-    intents: [<Button action="/result">Raffle!</Button>],
+    intents: [
+      <TextInput placeholder="Enter Start Date... 2024-09-01" />,
+      <Button action="/end-date">Next</Button>,
+    ],
+  });
+});
+
+app.frame("/end-date", (c) => {
+  startDate = c.inputText;
+  return c.res({
+    image: "/Default.png",
+    intents: [
+      <TextInput placeholder="Enter End Date... 2024-09-03" />,
+      <Button action="/raffle">Next</Button>,
+    ],
+  });
+});
+
+app.frame("/raffle", (c) => {
+  endDate = c.inputText;
+  return c.res({
+    image: "/Default.png",
+    intents: [<Button action="/result">Raffle !</Button>],
   });
 });
 
 app.frame("/result", async (c) => {
-  const winner: Participant = await getUserFromChannel();
-  console.log(winner);
+  const winner: Participant = await getUserFromChannel(startDate, endDate);
   const displayName = await getDisplayName(String(winner.fid));
-  console.log(displayName);
   const pfpUrl = await getUserPfpUrl(winner.fid);
-  console.log(pfpUrl);
-
   return c.res({
     image: getShareImage(displayName[0], pfpUrl),
-    intents: [<Button action="/">Back</Button>],
+    intents: [<Button action="/">Home</Button>],
   });
 });
 
