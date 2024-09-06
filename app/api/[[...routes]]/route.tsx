@@ -10,11 +10,14 @@ import {
   getDisplayName,
   getUserPfpUrl,
   getUserFromChannel,
+  getUserFromDate,
 } from "../../utils/helpers";
 import { getShareImage } from "../../ui/share";
 
+let type: string;
 let startDate: string | undefined;
 let endDate: string | undefined;
+let channel: string | undefined;
 
 const app = new Frog({
   assetsPath: "/",
@@ -29,6 +32,29 @@ const app = new Frog({
 });
 
 app.frame("/", (c) => {
+  return c.res({
+    image: "/Default.png",
+    intents: [
+      <Button action="/channel">Channel</Button>,
+      <Button action="/start-date">Date</Button>,
+    ],
+  });
+});
+
+app.frame("/channel", (c) => {
+  type = "channel";
+  return c.res({
+    image: "/Default.png",
+    intents: [
+      <TextInput placeholder="Enter channel" />,
+      <Button action="/raffle">Next</Button>,
+    ],
+  });
+});
+
+app.frame("/start-date", (c) => {
+  type = "date";
+  startDate = c.inputText;
   return c.res({
     image: "/Default.png",
     intents: [
@@ -50,7 +76,11 @@ app.frame("/end-date", (c) => {
 });
 
 app.frame("/raffle", (c) => {
-  endDate = c.inputText;
+  if (type === "channel") {
+    channel = c.inputText;
+  } else {
+    endDate = c.inputText;
+  }
   return c.res({
     image: "/Default.png",
     intents: [<Button action="/result">Raffle !</Button>],
@@ -58,7 +88,11 @@ app.frame("/raffle", (c) => {
 });
 
 app.frame("/result", async (c) => {
-  const winner: Participant = await getUserFromChannel(startDate, endDate);
+  console.log("/result", type);
+  const winner: Participant =
+    type === "channel"
+      ? await getUserFromChannel(channel)
+      : await getUserFromDate(startDate, endDate);
   const displayName = await getDisplayName(String(winner.fid));
   const pfpUrl = await getUserPfpUrl(winner.fid);
   return c.res({
