@@ -7,17 +7,16 @@ import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import { Participant } from "../../utils/interface";
 import {
-  getDisplayName,
+  getUserDisplayName,
   getUserPfpUrl,
-  getUserFromChannel,
-  getUserFromDate,
+  getUser,
 } from "../../utils/helpers";
 import { getShareImage } from "../../ui/share";
 
-let type: string;
+let channel: string | undefined;
 let startDate: string | undefined;
 let endDate: string | undefined;
-let channel: string | undefined;
+let limit: string | undefined;
 
 const app = new Frog({
   assetsPath: "/",
@@ -26,75 +25,81 @@ const app = new Frog({
   title: "Raffle among your fans",
   imageAspectRatio: "1:1",
   imageOptions: {
-    height: 1106,
-    width: 1106,
+    height: 800,
+    width: 800,
   },
 });
 
 app.frame("/", (c) => {
   return c.res({
     image: "/Default.png",
-    intents: [
-      <Button action="/channel">Channel</Button>,
-      <Button action="/start-date">Date</Button>,
-    ],
+    intents: [<Button action="/channel">Setting</Button>],
   });
 });
 
 app.frame("/channel", (c) => {
-  type = "channel";
+  channel = c.inputText;
   return c.res({
-    image: "/Default.png",
+    image: "/Steps.png",
     intents: [
       <TextInput placeholder="Enter channel" />,
-      <Button action="/raffle">Next</Button>,
+      <Button action="/">Back</Button>,
+      <Button action="/start-date">Next</Button>,
     ],
   });
 });
 
 app.frame("/start-date", (c) => {
-  type = "date";
   startDate = c.inputText;
   return c.res({
-    image: "/Default.png",
+    image: "/Steps.png",
     intents: [
       <TextInput placeholder="Enter Start Date... 2024-09-01" />,
+      <Button action="/channel">Back</Button>,
       <Button action="/end-date">Next</Button>,
     ],
   });
 });
 
 app.frame("/end-date", (c) => {
-  startDate = c.inputText;
+  endDate = c.inputText;
   return c.res({
-    image: "/Default.png",
+    image: "/Steps.png",
     intents: [
       <TextInput placeholder="Enter End Date... 2024-09-03" />,
+      <Button action="/start-date">Back</Button>,
+      <Button action="/limit">Next</Button>,
+    ],
+  });
+});
+
+app.frame("/limit", (c) => {
+  limit = c.inputText;
+  return c.res({
+    image: "/Steps.png",
+    intents: [
+      <TextInput placeholder="Enter limit... default: 25" />,
+      <Button action="/end-date">Back</Button>,
       <Button action="/raffle">Next</Button>,
     ],
   });
 });
 
 app.frame("/raffle", (c) => {
-  if (type === "channel") {
-    channel = c.inputText;
-  } else {
-    endDate = c.inputText;
-  }
   return c.res({
     image: "/Default.png",
-    intents: [<Button action="/result">Raffle !</Button>],
+    intents: [
+      <Button action="/limit">Back</Button>,
+      <Button action="/result">Raffle!</Button>,
+    ],
   });
 });
 
 app.frame("/result", async (c) => {
-  console.log("/result", type);
-  const winner: Participant =
-    type === "channel"
-      ? await getUserFromChannel(channel)
-      : await getUserFromDate(startDate, endDate);
-  const displayName = await getDisplayName(String(winner.fid));
+  const winner: Participant = await getUser(channel, startDate, endDate, limit);
+  const displayName = await getUserDisplayName(winner.fid);
   const pfpUrl = await getUserPfpUrl(winner.fid);
+
   return c.res({
     image: getShareImage(displayName[0], pfpUrl),
     intents: [<Button action="/">Home</Button>],
