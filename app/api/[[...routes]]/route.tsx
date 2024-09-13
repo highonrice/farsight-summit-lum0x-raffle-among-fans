@@ -10,13 +10,9 @@ import {
   getUserDisplayName,
   getUserPfpUrl,
   getUser,
+  postLum0xTestFrameValidation,
 } from "../../utils/helpers";
 import { getShareImage } from "../../ui/share";
-
-let channel: string | undefined;
-let startDate: string | undefined;
-let endDate: string | undefined;
-let limit: string | undefined;
 
 const app = new Frog({
   assetsPath: "/",
@@ -28,6 +24,11 @@ const app = new Frog({
     height: 800,
     width: 800,
   },
+  initialState: {
+    channel: "",
+    startDate: "",
+    limit: 25,
+  },
 });
 
 app.frame("/", (c) => {
@@ -37,8 +38,10 @@ app.frame("/", (c) => {
   });
 });
 
-app.frame("/channel", (c) => {
-  channel = c.inputText;
+app.frame("/channel", async (c) => {
+  const fid = c.frameData?.fid;
+  await postLum0xTestFrameValidation(Number(fid), "channel");
+
   return c.res({
     image: "/Steps.png",
     intents: [
@@ -49,32 +52,32 @@ app.frame("/channel", (c) => {
   });
 });
 
-app.frame("/start-date", (c) => {
-  startDate = c.inputText;
+app.frame("/start-date", async (c) => {
+  const fid = c.frameData?.fid;
+  await postLum0xTestFrameValidation(Number(fid), "start-date");
+
+  c.deriveState((previousState: any) => {
+    previousState.channel = c.inputText;
+  });
+
   return c.res({
     image: "/Steps.png",
     intents: [
       <TextInput placeholder="Enter Start Date... 2024-09-01" />,
       <Button action="/channel">Back</Button>,
-      <Button action="/end-date">Next</Button>,
-    ],
-  });
-});
-
-app.frame("/end-date", (c) => {
-  endDate = c.inputText;
-  return c.res({
-    image: "/Steps.png",
-    intents: [
-      <TextInput placeholder="Enter End Date... 2024-09-03" />,
-      <Button action="/start-date">Back</Button>,
       <Button action="/limit">Next</Button>,
     ],
   });
 });
 
-app.frame("/limit", (c) => {
-  limit = c.inputText;
+app.frame("/limit", async (c) => {
+  const fid = c.frameData?.fid;
+  await postLum0xTestFrameValidation(Number(fid), "limit");
+
+  c.deriveState((previousState: any) => {
+    previousState.endDate = c.inputText;
+  });
+
   return c.res({
     image: "/Steps.png",
     intents: [
@@ -86,6 +89,10 @@ app.frame("/limit", (c) => {
 });
 
 app.frame("/raffle", (c) => {
+  let state = c.deriveState((previousState: any) => {
+    previousState.limit = parseInt(c.inputText ? c.inputText : "25", 10);
+  });
+
   return c.res({
     image: "/Default.png",
     intents: [
@@ -95,13 +102,14 @@ app.frame("/raffle", (c) => {
   });
 });
 
-app.frame("/result", async (c) => {
-  const winner: Participant = await getUser(channel, startDate, endDate, limit);
+app.frame("/result", async (c: any) => {
+  const { channel, startDate, limit } = c.previousState;
+  const winner: Participant = await getUser(channel, startDate, limit);
   const displayName = await getUserDisplayName(winner.fid);
   const pfpUrl = await getUserPfpUrl(winner.fid);
 
   return c.res({
-    image: getShareImage(displayName[0], pfpUrl),
+    image: getShareImage(displayName, pfpUrl),
     intents: [<Button action="/">Home</Button>],
   });
 });

@@ -2,6 +2,7 @@
 import { Box } from "../api/[[...routes]]/ui";
 
 export function getShareImage(displayName?: string, pfpUrl?: string) {
+  console.log(displayName);
   return (
     <Box
       grow
@@ -28,12 +29,12 @@ export function getShareImage(displayName?: string, pfpUrl?: string) {
         style={{
           position: "absolute",
           display: "flex",
-          top: 730,
-          left: 450,
-          width: 300,
+          top: 600,
+          left: 350,
+          width: 500,
           height: 45,
           color: "white",
-          fontSize: 54,
+          fontSize: 44,
           fontFamily: "coinbase",
         }}
       >
@@ -43,8 +44,8 @@ export function getShareImage(displayName?: string, pfpUrl?: string) {
         style={{
           position: "absolute",
           display: "flex",
-          top: 300,
-          left: 380,
+          top: 180,
+          left: 200,
           width: "28%",
           fontFamily: "Poppins",
         }}
