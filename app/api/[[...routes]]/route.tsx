@@ -31,7 +31,10 @@ const app = new Frog({
   },
 });
 
-app.frame("/", (c) => {
+app.frame("/", async (c) => {
+  const fid = c.frameData?.fid;
+  await postLum0xTestFrameValidation(Number(fid), "app");
+
   return c.res({
     image: "/Default.png",
     intents: [<Button action="/channel">Setting</Button>],
