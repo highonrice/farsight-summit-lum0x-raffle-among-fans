@@ -92,7 +92,7 @@ app.frame("/limit", async (c) => {
 });
 
 app.frame("/raffle", (c) => {
-  let state = c.deriveState((previousState: any) => {
+  c.deriveState((previousState: any) => {
     previousState.limit = parseInt(c.inputText ? c.inputText : "25", 10);
   });
 

@@ -11,7 +11,6 @@ export async function getUserPfpUrl(fid: number): Promise<string> {
 export async function getUserDisplayName(fid: number): Promise<string> {
   const res = await Lum0x.farcasterUser.getUserByFids({ fids: String(fid) });
   const user = res.users[0];
-
   return user.display_name;
 }
 

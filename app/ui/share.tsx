@@ -2,7 +2,6 @@
 import { Box } from "../api/[[...routes]]/ui";
 
 export function getShareImage(displayName?: string, pfpUrl?: string) {
-  console.log(displayName);
   return (
     <Box
       grow
